@@ -140,6 +140,12 @@ function canPlayerPlay() {
 function handleCellClick(cell) {
     const number = parseInt(cell.dataset.number);
 
+    // Vérifie si le joueur 1 joue son premier tour avec un nombre pair
+    if (playedNumbers.length === 0 && currentPlayer === 1 && number % 2 !== 0) {
+        alert("Le premier joueur doit commencer par un nombre pair !");
+        return;
+    }
+
     // Vérifie si la case est déjà jouée (uniquement pour les nombres premiers)
     if (isPrime(number) && playedNumbers.includes(number)) {
         alert('Ce nombre a déjà été joué.');
