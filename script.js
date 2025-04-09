@@ -15,18 +15,24 @@ let playerScores = [0, 0];
 let playerVictories = [0, 0];
 let playerDefeats = [0, 0];
 let boResults = [];
-let boMaxRounds = parseInt(localStorage.getItem("boMax")) || null;
+let boMaxRounds = localStorage.getItem("boMax") !== null ? parseInt(localStorage.getItem("boMax")) : null;
 
 // Met à jour le texte BO
 const boStatus = document.getElementById("boStatus");
-if (boStatus && boMaxRounds) {
-  boStatus.textContent = `BO${boMaxRounds}`;
+const boIcons = document.getElementById("boIcons");
+if (boStatus && boIcons) {
+  if (boMaxRounds) {
+    boStatus.textContent = `BO${boMaxRounds}`;
+    updateBoIcons();
+  } else {
+    boStatus.textContent = "";
+    boIcons.innerHTML = "";
+  }
 }
 
 // Icônes Material Symbols pour les pastilles BO
-function updateBoIcons(rounds = boMaxRounds || 3, resultArray = boResults) {
-  const boIcons = document.getElementById('boIcons');
-  if (!boIcons) return;
+function updateBoIcons(rounds = boMaxRounds || 0, resultArray = boResults) {
+  if (!boIcons || !boMaxRounds) return;
   boIcons.innerHTML = '';
 
   for (let i = 0; i < rounds; i++) {
@@ -141,28 +147,44 @@ function handleCellClick(cell) {
   const number = parseInt(cell.dataset.number);
 
   if (playedNumbers.length === 0 && currentPlayer === 1 && number % 2 !== 0) {
-    alert("Le premier joueur doit commencer par un nombre pair !");
-    return;
+    showGameAlert("Le premier joueur doit commencer par un nombre pair !", "danger");    return;
   }
 
   if (isPrime(number) && playedNumbers.includes(number)) {
-    alert("Ce nombre a déjà été joué.");
-    return;
+    showGameAlert("Ce nombre a déjà été joué.", "danger");    return;
   }
 
   if (mustPlayGreaterThan50 && number < 50) {
-    alert("Vous devez jouer un nombre supérieur ou égal à 50 en réponse à la case Magicarpe.");
-    return;
+    showGameAlert("Vous devez jouer un nombre supérieur ou égal à 50 en réponse à la case Magicarpe.", "danger");    return;
   }
 
   if (lastNumber !== null && number !== 1) {
     if (number % lastNumber !== 0 && lastNumber % number !== 0) {
-      alert("Vous devez choisir un multiple ou un diviseur du dernier nombre joué.");
-      return;
+      showGameAlert("Vous devez choisir un multiple ou un diviseur du dernier nombre joué.", "danger");      return;
     }
   }
 
+  if (number === 1) {
+    // Donne 100 points à l'adversaire
+    const opponent = currentPlayer === 1 ? 1 : 0;
+    playerScores[opponent] += 100;
+    updatePlayerInfo();
+  
+    console.log("Règle spéciale activée : l'adversaire doit jouer un nombre supérieur ou égal à 50.");
+    mustPlayGreaterThan50 = true;
+  } else {
+    mustPlayGreaterThan50 = false;
+  }
+  
+
   addHistory(`${playerNames[currentPlayer - 1]} a joué : ${number}`);
+
+  // Attribution du score standard ou triple si nombre premier
+  if (isPrime(number)) {
+    playerScores[currentPlayer - 1] += number * 3;
+  } else {
+    playerScores[currentPlayer - 1] += number;
+  }
 
   cell.classList.remove("notPlayed");
   cell.classList.add("played");
@@ -181,20 +203,28 @@ function handleCellClick(cell) {
   if (!canPlayerPlay()) {
     const winner = currentPlayer === 1 ? 1 : 0;
     const loser = currentPlayer === 1 ? 0 : 1;
-    alert(`${playerNames[currentPlayer - 1]} ne peut plus jouer. ${playerNames[winner]} gagne la partie !`);
-
-    playerScores[winner]++;
+    showGameAlert(`${playerNames[currentPlayer - 1]} ne peut plus jouer. ${playerNames[winner]} gagne la partie !`, "danger");
     playerVictories[winner]++;
     playerDefeats[loser]++;
     boResults.push(winner + 1);
+
+    // Bonus score sur la dernière case jouée
+    if (isPrime(lastNumber)) {
+      playerScores[winner] += 1000;
+    } else {
+      playerScores[winner] += 500;
+    }
+
+    updatePlayerInfo();
+    updateVictoryDefeatDisplay();
+    updateBoIcons();
 
     updatePlayerInfo();
     updateVictoryDefeatDisplay();
     updateBoIcons();
 
     if (boMaxRounds && boResults.filter(r => r === winner + 1).length > Math.floor(boMaxRounds / 2)) {
-      alert(`${playerNames[winner]} remporte le BO${boMaxRounds} ! Retour au menu.`);
-      localStorage.removeItem("boMax");
+      showGameAlert(`${playerNames[winner]} remporte le BO${boMaxRounds} ! Retour au menu.`, "danger");      localStorage.removeItem("boMax");
       window.location.href = "index.html";
       return;
     }
@@ -247,3 +277,17 @@ function indexRegles() {
   window.location.href = "index.html";
 }
 
+
+function showGameAlert(message, type = 'danger') {
+  const alertBox = document.getElementById('gameAlert');
+  alertBox.className = `alert alert-${type}`;
+  alertBox.textContent = message;
+  alertBox.classList.remove('d-none');
+
+  // Masque automatiquement après 4 secondes (sauf fin de partie)
+  if (type !== 'light') {
+    setTimeout(() => {
+      alertBox.classList.add('d-none');
+    }, 4000);
+  }
+}

@@ -10,32 +10,32 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         .material-symbols-outlined {
-          font-variation-settings:
-            'FILL' 0,
-            'wght' 400,
-            'GRAD' 0,
-            'opsz' 24;
-          font-size: 28px;
-          vertical-align: middle;
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+            font-size: 28px;
+            vertical-align: middle;
         }
-      
+
         .score-icons {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
         }
-      
+
         .score-icons .material-symbols-outlined.green {
-          color: green;
+            color: green;
         }
-      
+
         .score-icons .material-symbols-outlined.red {
-          color: red;
+            color: red;
         }
-      
+
         .score-icons .material-symbols-outlined.gray {
-          color: gray;
+            color: gray;
         }
     </style>
 </head>
@@ -43,6 +43,9 @@
 <body class="bg-light text-dark">
     <div class="container py-4">
         <h1 class="text-center mb-4">Juniper Green Pokémon - Partie</h1>
+
+        <div id="gameAlert" class="alert d-none" role="alert"></div>
+
 
         <!-- Scoreboard -->
         <div class="row text-center mb-4 align-items-center">
