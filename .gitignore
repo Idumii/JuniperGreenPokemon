@@ -1,0 +1,10 @@
+# Systèmes
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Sauvegardes
+*.log
+*.tmp
