@@ -39,9 +39,9 @@
                     }
                 })
             })
-            .then(res => res.json())
-            .then(data => console.log("✅ Réponse API :", data))
-            .catch(err => console.error("❌ Erreur API :", err));
+            .then(res => res.text()) // <-- ici on utilise text() pour voir l’erreur brute
+            .then(data => console.log("Réponse brute :", data))
+            .catch(err => console.error("Erreur API :", err));
         }
     </script>
 </body>
