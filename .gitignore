@@ -8,3 +8,6 @@ Thumbs.db
 # Sauvegardes
 *.log
 *.tmp
+
+# PHP
+.env.php

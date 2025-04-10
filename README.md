@@ -19,3 +19,9 @@ Ce projet est un petit jeu éducatif inspiré de la règle mathématique du Juni
 ## Lancer le jeu
 
 Ouvrir `index.html` dans un navigateur moderne.
+
+
+
+
+## Informations supplémentaires
+🔐 Pensez à dupliquer .env.example.php en .env.php et à y mettre vos identifiants.
