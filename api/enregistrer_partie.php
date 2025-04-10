@@ -36,12 +36,12 @@ function getOrCreateJoueur(PDO $pdo, $joueur) {
 
     if ($id) {
         // Mise à jour score, victoires, défaites
-        $update = $pdo->prepare("UPDATE joueurs SET score = ?, nb_victoires = ?, nb_defaites = ? WHERE id = ?");
-        $update->execute([$joueur['score'], $joueur['victoires'], $joueur['defaites'], $id]);
+        $update = $pdo->prepare("UPDATE joueurs SET score_total = ?, nb_victoires = ?, nb_defaites = ? WHERE id = ?");
+        $update->execute([$joueur['score_total'], $joueur['victoires'], $joueur['defaites'], $id]);
     } else {
         // Insertion joueur
-        $insert = $pdo->prepare("INSERT INTO joueurs (nom, score, nb_victoires, nb_defaites) VALUES (?, ?, ?, ?)");
-        $insert->execute([$joueur['nom'], $joueur['score'], $joueur['victoires'], $joueur['defaites']]);
+        $insert = $pdo->prepare("INSERT INTO joueurs (nom, score_total, nb_victoires, nb_defaites) VALUES (?, ?, ?, ?)");
+        $insert->execute([$joueur['nom'], $joueur['score_total'], $joueur['victoires'], $joueur['defaites']]);
         $id = $pdo->lastInsertId();
     }
 
@@ -58,7 +58,7 @@ try {
     $id2 = getOrCreateJoueur($pdo, $joueur2);
 
     // Déduction du gagnant
-    $gagnant_id = ($joueur1['score'] > $joueur2['score']) ? $id1 : $id2;
+    $gagnant_id = ($joueur1['score_total'] > $joueur2['score_total']) ? $id1 : $id2;
 
     // Insertion de la partie
     $stmt = $pdo->prepare("
