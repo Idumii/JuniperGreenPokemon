@@ -36,11 +36,11 @@ function getOrCreateJoueur(PDO $pdo, $joueur) {
 
     if ($id) {
         // Mise à jour score, victoires, défaites
-        $update = $pdo->prepare("UPDATE joueurs SET score_total = ?, nb_victoires = ?, nb_defaites = ? WHERE id = ?");
+        $update = $pdo->prepare("UPDATE joueurs SET score_total = ?, victoires = ?, defaites = ? WHERE id = ?");
         $update->execute([$joueur['score_total'], $joueur['victoires'], $joueur['defaites'], $id]);
     } else {
         // Insertion joueur
-        $insert = $pdo->prepare("INSERT INTO joueurs (nom, score_total, nb_victoires, nb_defaites) VALUES (?, ?, ?, ?)");
+        $insert = $pdo->prepare("INSERT INTO joueurs (nom, score_total, victoires, defaites) VALUES (?, ?, ?, ?)");
         $insert->execute([$joueur['nom'], $joueur['score_total'], $joueur['victoires'], $joueur['defaites']]);
         $id = $pdo->lastInsertId();
     }
