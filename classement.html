@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Classement & Historique</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+</head>
+<body class="p-4">
+
+  <h1>Classement Global</h1>
+  <a href="index.html">Retour aux règles</a>
+
+  <table class="table table-striped" id="tblClassement">
+    <thead><tr>
+      <th>#</th>
+      <th>Joueur</th>
+      <th>Score</th>
+      <th>V</th>
+      <th>D</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Dernières Parties</h2>
+  <ul class="list-group" id="lstHistorique"></ul>
+
+  <script>
+    fetch("api/get_leaderboard.php")
+      .then(res => res.json())
+      .then(data => {
+        // classement
+        const table = document.querySelector("#tblClassement tbody");
+        data.leaderboard.forEach((p, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${p.nom}</td>
+            <td>${p.score_total}</td>
+            <td>${p.victoires}</td>
+            <td>${p.defaites}</td>
+          `;
+          table.appendChild(tr);
+        });
+
+        // historique
+        const ul = document.getElementById("lstHistorique");
+        data.history.forEach(p => {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.textContent = 
+            `${p.date_partie} — ${p.j1} (${p.score_j1}) vs ${p.j2} (${p.score_j2}) — ` +
+            `coup gagnant : ${p.coup_gagnant}`;
+          ul.appendChild(li);
+        });
+      })
+      .catch(console.error);
+  </script>
+</body>
+</html>
