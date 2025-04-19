@@ -166,3 +166,17 @@ button:hover {
 .score-icons .material-symbols-outlined.gray {
   color: gray;
 }
+
+.box-green {
+  background-color: #e6f4ea;      /* vert très clair */
+  border-left: 4px solid #28a745; /* bande verte */
+  padding: 1rem;                  /* un peu d’air à l’intérieur */
+  border-radius: 0.25rem;         /* coins arrondis */
+}
+
+.box-yellow {
+  background-color: #fff8e1;      /* jaune très clair */
+  border-left: 4px solid #ffc107; /* bande jaune */
+  padding: 1rem;
+  border-radius: 0.25rem;
+}

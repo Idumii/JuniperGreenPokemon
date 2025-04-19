@@ -3,72 +3,152 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juniper Green - Règles du Jeu</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Juniper Green – Règles & Classement</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
   <style>
-    .box-green {
-      background-color: #e6f4ea;
-      border-left: 6px solid #2e7d32;
-      padding: 10px;
+    /* Pour donner un peu d’air à ton layout */
+    .rules-container {
+      padding-right: 2rem;
     }
 
-    .box-yellow {
-      background-color: #fff8e1;
-      border-left: 6px solid #fbc02d;
-      padding: 10px;
+    .sidebar .card {
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar {
+      max-height: 80vh;
+      overflow-y: auto;
     }
   </style>
 </head>
 
-<body class="bg-light text-dark">
-  <div class="container py-4">
+<body class="py-4 pb-5">
+
+  <div class="container">
     <h1 class="text-center bg-primary text-white p-2 rounded">Juniper Green - Règles du Jeu</h1>
+    <div class="row">
+      <!-- COLONNE GAUCHE : 8/12 -->
+      <div class="col-lg-8 rules-container">
 
-    <h3 class="mt-4">Consignes</h3>
-    <p>Le Joueur 1 choisit un <strong>nombre pair</strong> dans la grille, le Joueur 2 doit répondre en choisissant un <strong>multiple</strong> ou un <strong>diviseur</strong> de ce nombre.</p>
-    <p>La main revient ensuite au Joueur 1, qui doit à son tour choisir un multiple ou un diviseur du dernier nombre joué par son adversaire.</p>
-    <p><strong>Un même nombre ne peut pas être utilisé plus d'une fois.</strong></p>
-    <p>Le jeu continue jusqu'à ce qu'un joueur ne puisse plus jouer.</p>
 
-    <h3 class="mt-4">Cases spéciales</h3>
+        <h3 class="mt-4">Consignes</h3>
+        <p>Le Joueur 1 choisit un <strong>nombre pair</strong> dans la grille, le Joueur 2 doit répondre en choisissant
+          un <strong>multiple</strong> ou un <strong>diviseur</strong> de ce nombre.</p>
+        <p>La main revient ensuite au Joueur 1, qui doit à son tour choisir un multiple ou un diviseur du dernier nombre
+          joué par son adversaire.</p>
+        <p><strong>Un même nombre ne peut pas être utilisé plus d'une fois.</strong></p>
+        <p>Le jeu continue jusqu'à ce qu'un joueur ne puisse plus jouer.</p>
 
-    <div class="box-green mb-3">
-      <strong>Cases Pokémon</strong>
-      <p>Lorsque vous jouez une case possédant un Pokémon (sauf la case <strong>1</strong>), toutes les cases <strong>sans Pokémon</strong> redeviennent jouables.</p>
-    </div>
+        <h3 class="mt-4">Cases spéciales</h3>
 
-    <div class="box-yellow mb-4">
-      <strong>Case Magicarpe</strong>
-      <p>Lorsque vous jouez la case <strong>1</strong> (correspondant à Magicarpe), votre adversaire ne pourra répondre qu'en choisissant un nombre <strong>supérieur ou égal à 50</strong>.</p>
-    </div>
+        <div class="box-green mb-3">
+          <strong>Cases Pokémon</strong>
+          <p>Lorsque vous jouez une case possédant un Pokémon (sauf la case <strong>1</strong>), toutes les cases
+            <strong>sans Pokémon</strong> redeviennent jouables.
+          </p>
+        </div>
 
-    <div class="text-center">
-      <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
-      <div class="d-flex justify-content-center gap-2">
-        <button class="btn btn-outline-secondary" onclick="startBo(1)">BO1</button>
-        <button class="btn btn-outline-secondary" onclick="startBo(3)">BO3</button>
-        <button class="btn btn-outline-secondary" onclick="startBo(5)">BO5</button>
+        <div class="box-yellow mb-4">
+          <strong>Case Magicarpe</strong>
+          <p>Lorsque vous jouez la case <strong>1</strong> (correspondant à Magicarpe), votre adversaire ne pourra
+            répondre qu'en choisissant un nombre <strong>supérieur ou égal à 50</strong>.</p>
+        </div>
+
+        <div class="text-center">
+          <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-outline-secondary" onclick="startBo(1)">BO1</button>
+            <button class="btn btn-outline-secondary" onclick="startBo(3)">BO3</button>
+            <button class="btn btn-outline-secondary" onclick="startBo(5)">BO5</button>
+          </div>
+
+        </div>
       </div>
-      <a href="classement.html">Voir le Classement</a>
-    </div>
-  </div>
+
+      <!-- COLONNE DROITE : 4/12 -->
+      <div class="col-lg-4 sidebar">
+        <!-- Cadre Classement -->
+        <div class="card">
+          <div class="card-header bg-primary text-white">Classement global</div>
+          <div class="card-body p-2">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Joueur</th>
+                  <th>Pts</th>
+                </tr>
+              </thead>
+              <tbody id="tblSidebarClassement"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Cadre Historique -->
+        <div class="card">
+          <div class="card-header bg-secondary text-white">Dernières parties</div>
+          <div class="card-body p-2">
+            <ul class="list-unstyled small" id="lstSidebarHistorique"></ul>
+          </div>
+        </div>
+      </div><!-- /.col-lg-4 -->
+
+    </div><!-- /.row -->
+  </div><!-- /.container -->
 
   <script>
-    function startGame() {
-      localStorage.removeItem('boMax');
-      window.location.href = 'game.html';
-    }
+    // Récupère classement + historique
+    fetch("api/get_leaderboard.php")
+      .then(r => r.json())
+      .then(data => {
+        // Classement
+        const tb = document.getElementById("tblSidebarClassement");
+        data.leaderboard.forEach((p, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${p.nom}</td>
+            <td>${p.score_total}</td>
+          `;
+          tb.appendChild(tr);
+        });
 
-    function startBo(max) {
-      localStorage.setItem('boMax', max);
-      window.location.href = 'game.html';
+        // Historique
+        const ul = document.getElementById("lstSidebarHistorique");
+        data.history.forEach(p => {
+          const li = document.createElement("li");
+          li.textContent =
+            `${new Date(p.date_partie).toLocaleDateString()} — ` +
+            `${p.j1}(${p.score_j1}) vs ${p.j2}(${p.score_j2})`;
+          ul.appendChild(li);
+        });
+      })
+      .catch(console.error);
+
+    // Fonctions pour démarrer / choisir BO
+    function setBO(n) {
+      localStorage.setItem("boMax", n);
+      window.location.href = "game.html";
+    }
+    function startGame() {
+      localStorage.removeItem("boMax");
+      window.location.href = "game.html";
     }
   </script>
-  <footer class="text-center mt-4">
-    <a href="mentions-legales.html">Mentions légales</a>
+
+  <footer class="bg-light text-center text-muted py-3 fixed-bottom">
+    <div class="container">
+      <small>
+        Site web développé par Vincent Diévart.
+        <a href="mentions-legales.html" class="text-decoration-none">Mentions légales</a>
+      </small>
+    </div>
   </footer>
 </body>
 
+</html>
+
+</body>
 
 </html>

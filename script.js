@@ -24,6 +24,8 @@ let coupsJ1   = [];
 let coupsJ2   = [];
 let erreursJ1 = [];
 let erreursJ2 = [];
+const historyList1 = document.getElementById("historyList1");
+const historyList2 = document.getElementById("historyList2");
 
 // Met à jour le texte BO
 const boStatus = document.getElementById("boStatus");
@@ -127,10 +129,25 @@ function updateVictoryDefeatDisplay() {
   document.getElementById("victory2").textContent = playerVictories[1];
   document.getElementById("defeat2").textContent  = playerDefeats[1];
 }
-function addHistory(entry) {
-  const li = document.createElement("li");
-  li.textContent = entry;
-  historyList.appendChild(li);
+
+function renderHistory() {
+  // vide les deux listes
+  historyList1.innerHTML = "";
+  historyList2.innerHTML = "";
+
+  // si le joueur 1 a joué au moins un coup
+  if (coupsJ1.length > 0) {
+    const li = document.createElement("li");
+    li.textContent = coupsJ1.join(" – ");
+    historyList1.appendChild(li);
+  }
+
+  // même chose pour le joueur 2
+  if (coupsJ2.length > 0) {
+    const li = document.createElement("li");
+    li.textContent = coupsJ2.join(" – ");
+    historyList2.appendChild(li);
+  }
 }
 
 // Vérifie si un coup est possible
@@ -183,9 +200,7 @@ function handleCellClick(cell) {
     mustPlayGreaterThan50 = false;
   }
 
-  // Ajout à l'historique
-  addHistory(`${playerNames[currentPlayer-1]} a joué : ${number}`);
-
+  renderHistory();
   // Score standard ou triple si premier
   playerScores[currentPlayer-1] += isPrime(number) ? number*3 : number;
 
