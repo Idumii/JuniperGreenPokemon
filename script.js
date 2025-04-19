@@ -70,7 +70,12 @@ if (name1Input && name2Input) {
 
 // Tableau des images Pokémon
 const pokemonImages = [
-  "images/tortipousse.png", "images/ouisticram.png", "images/tiplouf.png", /* ... */
+  "images/tortipousse.png", "images/ouisticram.png", "images/tiplouf.png", "images/etourmi.png",
+  "images/luxio.png", "images/cranidos.png", "images/dinoclier.png", "images/blizzi.png",
+  "images/griknot.png", "images/luxray.png", "images/etouraptor.png", "images/charkos.png",
+  "images/torterra.png", "images/simiabraze.png", "images/pingoleon.png", "images/motisma.png",
+  "images/bastiodon.png", "images/blizzaroi.png", "images/carchakrok.png", "images/elekable.png",
+  "images/manaphy.png", "images/cresselia.png", "images/shaymin.png", "images/darkrai.png",
   "images/regigigas.png"
 ];
 let primeIndex = 1;
