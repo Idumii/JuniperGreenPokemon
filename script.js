@@ -16,6 +16,8 @@ let playerVictories = [0, 0];
 let playerDefeats = [0, 0];
 let boResults = [];
 let boMaxRounds = localStorage.getItem("boMax") !== null ? parseInt(localStorage.getItem("boMax")) : null;
+let coupsJ1 = [];
+let coupsJ2 = [];
 
 // Met à jour le texte BO
 const boStatus = document.getElementById("boStatus");
@@ -198,39 +200,66 @@ function handleCellClick(cell) {
     resetNormalCells();
   }
 
+  // stocke le coup dans l’array correspondant
+  if (currentPlayer === 1) {
+    coupsJ1.push(number);
+  } else {
+    coupsJ2.push(number);
+  }
+
   currentPlayer = currentPlayer === 1 ? 2 : 1;
 
   if (!canPlayerPlay()) {
-    const winner = currentPlayer === 1 ? 1 : 0;
-    const loser = currentPlayer === 1 ? 0 : 1;
-    showGameAlert(`${playerNames[currentPlayer - 1]} ne peut plus jouer. ${playerNames[winner]} gagne la partie !`, "danger");
-    playerVictories[winner]++;
-    playerDefeats[loser]++;
-    boResults.push(winner + 1);
+    // Détection du gagnant et du perdant
+    const winnerIdx = currentPlayer === 1 ? 1 : 0;
+    const loserIdx  = currentPlayer === 1 ? 0 : 1;
 
-    // Bonus score sur la dernière case jouée
+    // Message de fin de manche
+    showGameAlert(
+      `${playerNames[currentPlayer - 1]} ne peut plus jouer. ${playerNames[winnerIdx]} gagne la manche !`,
+      "danger"
+    );
+
+    // Mise à jour des stats locales
+    playerVictories[winnerIdx]++;
+    playerDefeats[loserIdx]++;
+
+    // Système de BO
+    boResults.push(winnerIdx + 1);
+
+    // Bonus de fin : +500 ou +1000 selon que la dernière case soit premier
     if (isPrime(lastNumber)) {
-      playerScores[winner] += 1000;
+      playerScores[winnerIdx] += 1000;
     } else {
-      playerScores[winner] += 500;
+      playerScores[winnerIdx] += 500;
     }
 
+    // Mise à jour UI
     updatePlayerInfo();
     updateVictoryDefeatDisplay();
     updateBoIcons();
 
-    updatePlayerInfo();
-    updateVictoryDefeatDisplay();
-    updateBoIcons();
+    //  → Envoi vers l’API avant de redémarrer
+    sendResultToAPI(winnerIdx, lastNumber);
 
-    if (boMaxRounds && boResults.filter(r => r === winner + 1).length > Math.floor(boMaxRounds / 2)) {
-      showGameAlert(`${playerNames[winner]} remporte le BO${boMaxRounds} ! Retour au menu.`, "danger");      localStorage.removeItem("boMax");
-      window.location.href = "index.html";
+    // Si on a déjà remporté la majorité des manches, on termine le BO
+    const needed = Math.floor(boMaxRounds / 2) + 1;
+    const wins = boResults.filter(r => r === winnerIdx + 1).length;
+    if (boMaxRounds && wins >= needed) {
+      showGameAlert(
+        `${playerNames[winnerIdx]} remporte le BO${boMaxRounds} ! Retour au menu.`,
+        "light"
+      );
+      localStorage.removeItem("boMax");
+      // un léger délai pour laisser l’alerte s’afficher
+      setTimeout(() => window.location.href = "index.html", 1500);
       return;
     }
 
+    // Sinon on relance une nouvelle manche
     restartGame();
   }
+
 }
 
 function resetNormalCells() {
@@ -290,4 +319,42 @@ function showGameAlert(message, type = 'danger') {
       alertBox.classList.add('d-none');
     }, 4000);
   }
+}
+
+function sendResultToAPI(winnerIndex, lastMove) {
+  const data = {
+    joueur1: {
+      nom: playerNames[0],
+      score_total: playerScores[0],
+      victoires: playerVictories[0],
+      defaites: playerDefeats[0]
+    },
+    joueur2: {
+      nom: playerNames[1],
+      score_total: playerScores[1],
+      victoires: playerVictories[1],
+      defaites: playerDefeats[1]
+    },
+    partie: {
+      score_j1: playerScores[0],
+      score_j2: playerScores[1],
+      victoires_j1: playerVictories[0],
+      victoires_j2: playerVictories[1],
+      defaites_j1: playerDefeats[0],
+      defaites_j2: playerDefeats[1],
+      coups_j1: coupsJ1.join(","),
+      coups_j2: coupsJ2.join(","),
+      coup_gagnant: lastMove,
+    },
+    joueur_gagnant: playerNames[winnerIndex]
+  };
+
+  fetch("https://bawi2179.odns.fr/JuniperGreenPokemon/api/enregistrer_partie.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(json => console.log("Réponse API :", json))
+  .catch(err => console.error("Erreur d'envoi API :", err));
 }
