@@ -11,7 +11,7 @@ require_once(__DIR__ . "/.env.php");
 
 // Connexion BDD
 try {
-    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8", DB_USER, DB_PASS);
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8", DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     http_response_code(500);
@@ -28,7 +28,8 @@ if (!$data) {
 }
 
 // --- Fonctions utiles ---
-function getOrCreateJoueur(PDO $pdo, $joueur) {
+function getOrCreateJoueur(PDO $pdo, $joueur)
+{
     // Vérifie si le joueur existe
     $stmt = $pdo->prepare("SELECT id FROM joueurs WHERE nom = ?");
     $stmt->execute([$joueur['nom']]);
@@ -52,7 +53,9 @@ function getOrCreateJoueur(PDO $pdo, $joueur) {
 try {
     $joueur1 = $data['joueur1'];
     $joueur2 = $data['joueur2'];
-    $partie  = $data['partie'];
+    $partie = $data['partie'];
+    $erreurs1 = $partie['erreurs_coups_j1'] ?? '';
+    $erreurs2 = $partie['erreurs_coups_j2'] ?? '';
 
     $id1 = getOrCreateJoueur($pdo, $joueur1);
     $id2 = getOrCreateJoueur($pdo, $joueur2);
@@ -62,21 +65,41 @@ try {
 
     // Insertion de la partie
     $stmt = $pdo->prepare("
-        INSERT INTO parties (
-            joueur1_id, joueur2_id, joueur_gagnant_id,
-            score_j1, score_j2,
-            victoires_j1, victoires_j2,
-            defaites_j1, defaites_j2,
-            coups_j1, coups_j2, coup_gagnant, date_partie
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    INSERT INTO parties (
+      joueur1_id,
+      joueur2_id,
+      joueur_gagnant_id,
+      score_j1,
+      score_j2,
+      victoires_j1,
+      victoires_j2,
+      defaites_j1,
+      defaites_j2,
+      coups_j1,
+      erreurs_coups_j1,
+      coups_j2,
+      erreurs_coups_j2,
+      coup_gagnant,
+      date_partie
+    ) VALUES (
+      ?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW()
+    )
     ");
 
     $stmt->execute([
-        $id1, $id2, $gagnant_id,
-        $partie['score_j1'], $partie['score_j2'],
-        $partie['victoires_j1'], $partie['victoires_j2'],
-        $partie['defaites_j1'], $partie['defaites_j2'],
-        $partie['coups_j1'], $partie['coups_j2'],
+        $id1,
+        $id2,
+        $gagnant_id,
+        $partie['score_j1'],
+        $partie['score_j2'],
+        $partie['victoires_j1'],
+        $partie['victoires_j2'],
+        $partie['defaites_j1'],
+        $partie['defaites_j2'],
+        $partie['coups_j1'],
+        $erreurs1,
+        $partie['coups_j2'],
+        $erreurs2,
         $partie['coup_gagnant']
     ]);
 
