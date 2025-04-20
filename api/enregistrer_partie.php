@@ -1,149 +1,149 @@
 <?php
-// -----------------------------------------------------------------------------
-// enregistrer_partie.php
-// -----------------------------------------------------------------------------
-
-// 1) Pas d’erreurs à l’écran
-ini_set('display_errors',   '0');
-ini_set('display_startup_errors', '0');
-ini_set('log_errors',       '1');
+// activation des erreurs pour le dev
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// 2) Buffer + headers JSON / CORS
-ob_start();  // vide tout buffer éventuel (BOM, include, etc.)
+// JSON + CORS
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 
-// 3) Chargement des constantes de connexion
-$envFile = __DIR__ . '/.env.php';
-if (! is_readable($envFile)) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Fichier .env.php introuvable']);
-    exit;
-}
-require_once $envFile;
+require_once __DIR__ . '/.env.php';
 
-// 4) Connexion PDO
 try {
     $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8",
-        DB_USER,
-        DB_PASS,
-        [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
+      "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8",
+      DB_USER,
+      DB_PASS
     );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Erreur de connexion : '.$e->getMessage()]);
+    echo json_encode(['error' => 'BDD Connexion : '.$e->getMessage()]);
     exit;
 }
 
-// 5) Lecture + décodage JSON
-$payload = file_get_contents('php://input');
-$data    = json_decode($payload, true);
-
-if (! is_array($data)) {
+// lecture / décodage du JSON
+$raw  = file_get_contents('php://input');
+$data = json_decode($raw, true);
+if (
+  !$data
+  || !isset($data['joueur1'], $data['joueur2'], $data['partie'], $data['joueur_gagnant'])
+) {
     http_response_code(400);
-    echo json_encode(['error' => 'Données JSON manquantes ou invalides']);
+    echo json_encode(['error' => 'Payload JSON invalide ou manquant']);
     exit;
 }
 
-// 6) Fonction getOrCreateJoueur (incrémente le cumul, ne réécrit pas)
-function getOrCreateJoueur(PDO $pdo, array $joueur): int
-{
-    // vérifie si existe
-    $stmt = $pdo->prepare("SELECT id FROM joueurs WHERE nom = ?");
-    $stmt->execute([ $joueur['nom'] ]);
+// récupère / crée un joueur
+function getOrCreateJoueur(PDO $pdo, array $j) {
+    $sql = "SELECT id FROM joueurs WHERE nom = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$j['nom']]);
     $id = $stmt->fetchColumn();
 
     if ($id) {
-        // on incrémente le score_total, victoires & défaites
+        // incrémente
         $upd = $pdo->prepare("
-            UPDATE joueurs
-            SET
-              score_total = score_total + ?,
-              victoires   = victoires   + ?,
-              defaites    = defaites    + ?
-            WHERE id = ?
+          UPDATE joueurs
+          SET
+            score_total = score_total + ?,
+            victoires   = victoires   + ?,
+            defaites    = defaites    + ?
+          WHERE id = ?
         ");
         $upd->execute([
-            $joueur['score_total'],
-            $joueur['victoires'],
-            $joueur['defaites'],
-            $id
+          $j['score_total'],
+          $j['victoires'],
+          $j['defaites'],
+          $id
         ]);
     } else {
-        // nouvel utilisateur
+        // insert neuf
         $ins = $pdo->prepare("
-            INSERT INTO joueurs (nom, score_total, victoires, defaites)
-            VALUES (?, ?, ?, ?)
+          INSERT INTO joueurs (nom, score_total, victoires, defaites)
+          VALUES (?, ?, ?, ?)
         ");
         $ins->execute([
-            $joueur['nom'],
-            $joueur['score_total'],
-            $joueur['victoires'],
-            $joueur['defaites']
+          $j['nom'],
+          $j['score_total'],
+          $j['victoires'],
+          $j['defaites']
         ]);
-        $id = (int)$pdo->lastInsertId();
+        $id = $pdo->lastInsertId();
     }
 
-    return (int)$id;
+    return $id;
 }
 
-// 7) Traitement principal
+// --- préparation des données ---
+$j1 = $data['joueur1'];
+$j2 = $data['joueur2'];
+$p  = $data['partie'];
+
+// on récupère d'abord les listés de coups et d'erreurs
+$c1 = $j1['coups']   ?? '';
+$e1 = $j1['erreurs'] ?? '';
+$c2 = $j2['coups']   ?? '';
+$e2 = $j2['erreurs'] ?? '';
+
+// création / mise à jour des deux joueurs
+$id1 = getOrCreateJoueur($pdo, $j1);
+$id2 = getOrCreateJoueur($pdo, $j2);
+
+// détermine qui a gagné cette partie
+$gagnant = ($j1['score_total'] > $j2['score_total']) ? $id1 : $id2;
+
+// --- insertion dans parties ---
 try {
-    $j1       = $data['joueur1'];
-    $j2       = $data['joueur2'];
-    $partie   = $data['partie'];
-    $erreurs1 = $partie['erreurs_coups_j1'] ?? '';
-    $erreurs2 = $partie['erreurs_coups_j2'] ?? '';
-
-    $id1 = getOrCreateJoueur($pdo, $j1);
-    $id2 = getOrCreateJoueur($pdo, $j2);
-
-    // détermination du gagnant
-    $gagnantId = ($j1['score_total'] > $j2['score_total']) ? $id1 : $id2;
-
-    // insertion de la partie
-    $stmt = $pdo->prepare("
-        INSERT INTO parties (
-          joueur1_id,   joueur2_id,   joueur_gagnant_id,
-          score_j1,     score_j2,
-          victoires_j1, victoires_j2,
-          defaites_j1,  defaites_j2,
-          coups_j1,     erreurs_coups_j1,
-          coups_j2,     erreurs_coups_j2,
-          coup_gagnant, date_partie
-        ) VALUES (
-          ?,?,?,?,?,?,?,?,?,?,?,?,?, NOW()
-        )
-    ");
-
+    $sql = "
+      INSERT INTO parties (
+        joueur1_id,
+        joueur2_id,
+        joueur_gagnant_id,
+        score_j1,
+        score_j2,
+        victoires_j1,
+        victoires_j2,
+        defaites_j1,
+        defaites_j2,
+        coups_j1,
+        erreurs_coups_j1,
+        coups_j2,
+        erreurs_coups_j2,
+        coup_gagnant,
+        date_partie
+      ) VALUES (
+        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW()
+      )
+    ";
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        $id1,
-        $id2,
-        $gagnantId,
-        $partie['score_j1'],
-        $partie['score_j2'],
-        $partie['victoires_j1'],
-        $partie['victoires_j2'],
-        $partie['defaites_j1'],
-        $partie['defaites_j2'],
-        $partie['coups_j1'],
-        $erreurs1,
-        $partie['coups_j2'],
-        $erreurs2,
-        $partie['coup_gagnant']
+      $id1,
+      $id2,
+      $gagnant,
+
+      // stats de la manche
+      $p['score_j1'],
+      $p['score_j2'],
+      $p['victoires_j1'],
+      $p['victoires_j2'],
+      $p['defaites_j1'],
+      $p['defaites_j2'],
+
+      // coups / erreurs
+      $c1,
+      $e1,
+      $c2,
+      $e2,
+
+      // dernier coup gagnant
+      $p['coup_gagnant']
     ]);
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Partie enregistrée avec succès.'
-    ]);
-    exit;
-
+    echo json_encode(['success' => true]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Erreur : '.$e->getMessage()]);
-    exit;
+    echo json_encode(['error' => 'Requête : '.$e->getMessage()]);
 }
