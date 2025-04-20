@@ -36,13 +36,33 @@ function getOrCreateJoueur(PDO $pdo, $joueur)
     $id = $stmt->fetchColumn();
 
     if ($id) {
-        // Mise à jour score, victoires, défaites
-        $update = $pdo->prepare("UPDATE joueurs SET score_total = ?, victoires = ?, defaites = ? WHERE id = ?");
-        $update->execute([$joueur['score_total'], $joueur['victoires'], $joueur['defaites'], $id]);
+        // On INCRÉMENTE le score_total, victoires et défaites
+        $update = $pdo->prepare("
+          UPDATE joueurs
+          SET
+            score_total = score_total + ?,
+            victoires   = victoires   + ?,
+            defaites    = defaites    + ?
+          WHERE id = ?
+        ");
+        $update->execute([
+            $joueur['score_total'],  // points gagnés cette partie
+            $joueur['victoires'],    // 1 ou 0 selon victoire
+            $joueur['defaites'],     // 1 ou 0 selon défaite
+            $id
+        ]);
     } else {
-        // Insertion joueur
-        $insert = $pdo->prepare("INSERT INTO joueurs (nom, score_total, victoires, defaites) VALUES (?, ?, ?, ?)");
-        $insert->execute([$joueur['nom'], $joueur['score_total'], $joueur['victoires'], $joueur['defaites']]);
+        // Nouvel utilisateur, on insère ses premiers points
+        $insert = $pdo->prepare("
+          INSERT INTO joueurs (nom, score_total, victoires, defaites)
+          VALUES (?, ?, ?, ?)
+        ");
+        $insert->execute([
+            $joueur['nom'],
+            $joueur['score_total'],  // points de la première partie
+            $joueur['victoires'],    // 1 ou 0
+            $joueur['defaites']      // 1 ou 0
+        ]);
         $id = $pdo->lastInsertId();
     }
 
