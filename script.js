@@ -357,19 +357,8 @@ function resetNormalCells() {
 }
 
 function restartGame() {
-  playedNumbers = [];
-  currentPlayer = 1;
-  lastNumber = null;
-  mustPlayGreaterThan50 = false;
-  coupsJ1 = [];
-  coupsJ2 = [];
-  erreursJ1 = [];
-  erreursJ2 = [];
-  generateGrid();
-  addHistory(""); // clear historyList innerHTML plutôt si besoin
-  updatePlayerInfo();
-  updateVictoryDefeatDisplay();
-  updateBoIcons();
+  // recharge entièrement la page (en conservant boMax dans localStorage)
+  window.location.reload();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
