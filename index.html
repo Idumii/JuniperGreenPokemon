@@ -38,7 +38,8 @@
           un <strong>multiple</strong> ou un <strong>diviseur</strong> de ce nombre.</p>
         <p>La main revient ensuite au Joueur 1, qui doit à son tour choisir un multiple ou un diviseur du dernier nombre
           joué par son adversaire.</p>
-        <p><strong>Un même nombre ne peut pas être utilisé plus d'une fois.</strong></p>
+
+        <!--<p><strong>Un même nombre ne peut pas être utilisé plus d'une fois. </strong></p> -->
         <p>Le jeu continue jusqu'à ce qu'un joueur ne puisse plus jouer.</p>
 
         <h3 class="mt-4">Cases spéciales</h3>
@@ -56,15 +57,7 @@
             répondre qu'en choisissant un nombre <strong>supérieur ou égal à 50</strong>.</p>
         </div>
 
-        <div class="text-center">
-          <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
-          <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-outline-secondary" onclick="startBo(1)">BO1</button>
-            <button class="btn btn-outline-secondary" onclick="startBo(3)">BO3</button>
-            <button class="btn btn-outline-secondary" onclick="startBo(5)">BO5</button>
-          </div>
 
-        </div>
       </div>
 
       <!-- COLONNE DROITE : 4/12 -->
@@ -95,6 +88,15 @@
       </div><!-- /.col-lg-4 -->
 
     </div><!-- /.row -->
+    <div class="text-center">
+      <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
+      <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-outline-primary" onclick="startBo(1)">BO1</button>
+        <button class="btn btn-outline-warning" onclick="startBo(3)">BO3</button>
+        <button class="btn btn-outline-danger" onclick="startBo(5)">BO5</button>
+      </div>
+
+    </div>
   </div><!-- /.container -->
 
   <script>
@@ -145,10 +147,6 @@
       </small>
     </div>
   </footer>
-</body>
-
-</html>
-
 </body>
 
 </html>
