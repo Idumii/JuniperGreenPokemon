@@ -419,17 +419,13 @@ function sendResultToAPI(winnerIndex, lastMove) {
       nom: playerNames[0],
       score_total: playerScores[0],
       victoires: playerVictories[0],
-      defaites: playerDefeats[0],
-      coups: coupsJ1.join(","),
-      erreurs: erreursJ1.join(","),
+      defaites: playerDefeats[0]
     },
     joueur2: {
       nom: playerNames[1],
       score_total: playerScores[1],
       victoires: playerVictories[1],
-      defaites: playerDefeats[1],
-      coups: coupsJ2.join(","),
-      erreurs: erreursJ2.join(","),
+      defaites: playerDefeats[1]
     },
     partie: {
       score_j1: playerScores[0],
@@ -438,24 +434,29 @@ function sendResultToAPI(winnerIndex, lastMove) {
       victoires_j2: playerVictories[1],
       defaites_j1: playerDefeats[0],
       defaites_j2: playerDefeats[1],
-      coup_gagnant: lastMove,
+      // ici on met bien les clés attendues par le PHP
+      coups_j1: coupsJ1.join(","),
+      erreurs_coups_j1: erreursJ1.join(","),
+      coups_j2: coupsJ2.join(","),
+      erreurs_coups_j2: erreursJ2.join(","),
+      coup_gagnant: lastMove
     },
-    joueur_gagnant: playerNames[winnerIndex],
+    joueur_gagnant: playerNames[winnerIndex]
   };
 
   fetch("api/enregistrer_partie.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload)    // <— on stringify bien `payload`
   })
-    .then(async (res) => {
-      const text = await res.text(); // on récupère d’abord tout en tant que texte
-      try {
-        const json = JSON.parse(text); // on tente de parser
-        console.log("Réponse API :", json);
-      } catch (e) {
-        console.warn("Réponse API non‑JSON reçue :", text);
-      }
-    })
-    .catch((err) => console.error("Erreur d'envoi API :", err));
+  .then(async res => {
+    const text = await res.text();
+    try {
+      const json = JSON.parse(text);
+      console.log("Réponse API :", json);
+    } catch (e) {
+      console.warn("Réponse API non‑JSON reçue :", text);
+    }
+  })
+  .catch(err => console.error("Erreur d'envoi API :", err));
 }
