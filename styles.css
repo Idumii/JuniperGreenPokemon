@@ -97,9 +97,9 @@ body {
 }
 
 .grid-cell.played {
-  background-color: #e9ecef;
-  color: #4a4b4d;
-  cursor: not-allowed;
+  background-color: #6c757d !important;  /* gris foncé */
+  color: white        !important;
+  cursor: not-allowed !important;
 }
 
 .grid-cell.pokemon {

@@ -42,6 +42,12 @@ const btnRestartSameBo = document.getElementById("btnRestartSameBo");
 const btnBackToMenu    = document.getElementById("btnBackToMenu");
 const endBoModal       = new bootstrap.Modal(endBoModalEl);
 
+// Indicateur de tour
+function updateTurnIndicator() {
+  const el = document.getElementById("turnIndicator");
+  el.textContent = `Tour de ${playerNames[currentPlayer - 1]}`;
+}
+
 // Met à jour l’affichage BO
 const boStatus = document.getElementById("boStatus");
 const boIcons  = document.getElementById("boIcons");
@@ -233,6 +239,9 @@ function handleCellClick(cell) {
   // --- switch joueur ---
   currentPlayer = currentPlayer===1 ? 2 : 1;
 
+  // Met à jour l’indicateur de tour
+  updateTurnIndicator();
+
   // --- fin de manche ? ---
   if (!canPlayerPlay()) {
     const winnerIdx = currentPlayer===1 ? 1 : 0;
@@ -310,7 +319,37 @@ function resetNormalCells() {
 
 // relance « à blanc » la grille
 function restartGame() {
-  window.location.reload();
+  // Si on n'est PAS en mode BO (infinite mode), on recharge la page
+  if (!boMaxRounds) {
+    window.location.reload();
+    return;
+  }
+
+  // === mode BO : reset de la manche seulement ===
+  // 1) vide les coups & erreurs de la manche courante
+  coupsJ1 = [];
+  coupsJ2 = [];
+  erreursJ1 = [];
+  erreursJ2 = [];
+
+  // 2) reset des sélections de la grille
+  playedNumbers = [];
+  lastNumber = null;
+  mustPlayGreaterThan50 = false;
+
+  // 3) vide l'affichage historique
+  historyList1.innerHTML = "";
+  historyList2.innerHTML = "";
+
+  // 4) régénère la grille
+  grid.innerHTML = "";
+  generateGrid();
+
+  // 5) met à jour l'affichage du BO et du score
+  renderHistory();
+  updateBoIcons();
+  updateTurnIndicator();
+  updatePlayerInfo();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -318,6 +357,7 @@ window.addEventListener("DOMContentLoaded", () => {
   updateVictoryDefeatDisplay();
   generateGrid();
   updateBoIcons();
+  updateTurnIndicator();
 });
 
 // popup d’alerte de jeu
