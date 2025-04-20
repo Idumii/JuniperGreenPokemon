@@ -412,13 +412,11 @@ function sendResultToAPI(winnerIndex, lastMove) {
     joueur_gagnant: playerNames[winnerIndex],
   };
 
-  fetch(
-    "https://bawi2179.odns.fr/JuniperGreenPokemon/api/enregistrer_partie.php",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }
+  fetch("api/enregistrer_partie.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }
   )
     .then((res) => res.json())
     .then((json) => console.log("Réponse API :", json))
