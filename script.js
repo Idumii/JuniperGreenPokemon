@@ -6,30 +6,44 @@ const gridSize = 10;
 const grid = document.getElementById("gameGrid");
 const historyList = document.getElementById("historyList");
 
-let currentPlayer    = 1;
-let playedNumbers    = [];
-let lastNumber       = null;
+let currentPlayer = 1;
+let playedNumbers = [];
+let lastNumber = null;
 let mustPlayGreaterThan50 = false;
-let playerNames      = ["Joueur 1", "Joueur 2"];
-let playerScores     = [0, 0];
-let playerVictories  = [0, 0];
-let playerDefeats    = [0, 0];
-let boResults        = [];
-let boMaxRounds      = localStorage.getItem("boMax") !== null
-                       ? parseInt(localStorage.getItem("boMax"))
-                       : null;
+let playerNames = ["Joueur 1", "Joueur 2"];
+let playerScores = [0, 0];
+let playerVictories = [0, 0];
+let playerDefeats = [0, 0];
+let boResults = [];
+let boMaxRounds =
+  localStorage.getItem("boMax") !== null
+    ? parseInt(localStorage.getItem("boMax"))
+    : null;
 
 // Nouveaux tableaux pour stocker les coups et erreurs
-let coupsJ1   = [];
-let coupsJ2   = [];
+let coupsJ1 = [];
+let coupsJ2 = [];
 let erreursJ1 = [];
 let erreursJ2 = [];
 const historyList1 = document.getElementById("historyList1");
 const historyList2 = document.getElementById("historyList2");
 
+// en haut de ton fichier, récupère les éléments
+const endBoModalEl = document.getElementById("endBoModal");
+const modalScore1 = document.getElementById("modalScore1");
+const modalScore2 = document.getElementById("modalScore2");
+const modalVic1 = document.getElementById("modalVic1");
+const modalVic2 = document.getElementById("modalVic2");
+const boCountSpan = document.getElementById("boCount");
+const btnRestartSameBo = document.getElementById("btnRestartSameBo");
+const btnBackToMenu = document.getElementById("btnBackToMenu");
+
+// instance du modal (Bootstrap 5)
+const endBoModal = new bootstrap.Modal(endBoModalEl);
+
 // Met à jour le texte BO
 const boStatus = document.getElementById("boStatus");
-const boIcons  = document.getElementById("boIcons");
+const boIcons = document.getElementById("boIcons");
 if (boStatus && boIcons) {
   if (boMaxRounds) {
     boStatus.textContent = `BO${boMaxRounds}`;
@@ -66,19 +80,43 @@ function updateBoIcons(rounds = boMaxRounds || 0, resultArray = boResults) {
 const name1Input = document.getElementById("name1");
 const name2Input = document.getElementById("name2");
 if (name1Input && name2Input) {
-  name1Input.addEventListener("input", e => playerNames[0] = e.target.value);
-  name2Input.addEventListener("input", e => playerNames[1] = e.target.value);
+  name1Input.addEventListener(
+    "input",
+    (e) => (playerNames[0] = e.target.value)
+  );
+  name2Input.addEventListener(
+    "input",
+    (e) => (playerNames[1] = e.target.value)
+  );
 }
 
 // Tableau des images Pokémon
 const pokemonImages = [
-  "images/tortipousse.png", "images/ouisticram.png", "images/tiplouf.png", "images/etourmi.png",
-  "images/luxio.png", "images/cranidos.png", "images/dinoclier.png", "images/blizzi.png",
-  "images/griknot.png", "images/luxray.png", "images/etouraptor.png", "images/charkos.png",
-  "images/torterra.png", "images/simiabraze.png", "images/pingoleon.png", "images/motisma.png",
-  "images/bastiodon.png", "images/blizzaroi.png", "images/carchakrok.png", "images/elekable.png",
-  "images/manaphy.png", "images/cresselia.png", "images/shaymin.png", "images/darkrai.png",
-  "images/regigigas.png"
+  "images/tortipousse.png",
+  "images/ouisticram.png",
+  "images/tiplouf.png",
+  "images/etourmi.png",
+  "images/luxio.png",
+  "images/cranidos.png",
+  "images/dinoclier.png",
+  "images/blizzi.png",
+  "images/griknot.png",
+  "images/luxray.png",
+  "images/etouraptor.png",
+  "images/charkos.png",
+  "images/torterra.png",
+  "images/simiabraze.png",
+  "images/pingoleon.png",
+  "images/motisma.png",
+  "images/bastiodon.png",
+  "images/blizzaroi.png",
+  "images/carchakrok.png",
+  "images/elekable.png",
+  "images/manaphy.png",
+  "images/cresselia.png",
+  "images/shaymin.png",
+  "images/darkrai.png",
+  "images/regigigas.png",
 ];
 let primeIndex = 1;
 function isPrime(n) {
@@ -105,11 +143,12 @@ function generateGrid() {
     if (i === 1) {
       cell.style.backgroundImage = "url('images/magicarpe_shiny.png')";
     } else if (isPrime(i)) {
-      cell.style.backgroundImage =
-        `url('${pokemonImages[pIdx % pokemonImages.length]}')`;
+      cell.style.backgroundImage = `url('${
+        pokemonImages[pIdx % pokemonImages.length]
+      }')`;
       pIdx++;
     }
-    cell.style.backgroundSize   = "contain";
+    cell.style.backgroundSize = "contain";
     cell.style.backgroundRepeat = "no-repeat";
     cell.style.backgroundPosition = "center";
 
@@ -125,9 +164,9 @@ function updatePlayerInfo() {
 }
 function updateVictoryDefeatDisplay() {
   document.getElementById("victory1").textContent = playerVictories[0];
-  document.getElementById("defeat1").textContent  = playerDefeats[0];
+  document.getElementById("defeat1").textContent = playerDefeats[0];
   document.getElementById("victory2").textContent = playerVictories[1];
-  document.getElementById("defeat2").textContent  = playerDefeats[1];
+  document.getElementById("defeat2").textContent = playerDefeats[1];
 }
 
 function renderHistory() {
@@ -155,9 +194,13 @@ function canPlayerPlay() {
   for (const cell of document.querySelectorAll(".grid-cell.notPlayed")) {
     const num = +cell.dataset.number;
     if (
-      (lastNumber === null || num % lastNumber === 0 || lastNumber % num === 0 || num === 1) &&
+      (lastNumber === null ||
+        num % lastNumber === 0 ||
+        lastNumber % num === 0 ||
+        num === 1) &&
       (!mustPlayGreaterThan50 || num >= 50)
-    ) return true;
+    )
+      return true;
   }
   return false;
 }
@@ -169,23 +212,29 @@ function handleCellClick(cell) {
   // Validation & collecte d'erreurs
   if (playedNumbers.length === 0 && currentPlayer === 1 && number % 2 !== 0) {
     erreursJ1.push(number);
-    showGameAlert("Le premier joueur doit commencer par un nombre pair !", "danger");
+    showGameAlert(
+      "Le premier joueur doit commencer par un nombre pair !",
+      "danger"
+    );
     return;
   }
   if (isPrime(number) && playedNumbers.includes(number)) {
-    (currentPlayer===1 ? erreursJ1 : erreursJ2).push(number);
+    (currentPlayer === 1 ? erreursJ1 : erreursJ2).push(number);
     showGameAlert("Ce nombre a déjà été joué.", "danger");
     return;
   }
   if (mustPlayGreaterThan50 && number < 50) {
-    (currentPlayer===1 ? erreursJ1 : erreursJ2).push(number);
+    (currentPlayer === 1 ? erreursJ1 : erreursJ2).push(number);
     showGameAlert("Vous devez jouer un nombre ≥ 50 après Magicarpe.", "danger");
     return;
   }
   if (lastNumber !== null && number !== 1) {
     if (number % lastNumber !== 0 && lastNumber % number !== 0) {
-      (currentPlayer===1 ? erreursJ1 : erreursJ2).push(number);
-      showGameAlert("Choisissez un multiple ou un diviseur du dernier nombre.", "danger");
+      (currentPlayer === 1 ? erreursJ1 : erreursJ2).push(number);
+      showGameAlert(
+        "Choisissez un multiple ou un diviseur du dernier nombre.",
+        "danger"
+      );
       return;
     }
   }
@@ -202,7 +251,7 @@ function handleCellClick(cell) {
 
   renderHistory();
   // Score standard ou triple si premier
-  playerScores[currentPlayer-1] += isPrime(number) ? number*3 : number;
+  playerScores[currentPlayer - 1] += isPrime(number) ? number * 3 : number;
 
   // Marquage de la case
   cell.classList.replace("notPlayed", "played");
@@ -216,30 +265,30 @@ function handleCellClick(cell) {
 
   // Stockage du coup valide
   if (currentPlayer === 1) coupsJ1.push(number);
-  else                   coupsJ2.push(number);
+  else coupsJ2.push(number);
 
   // Passe au joueur suivant
   currentPlayer = currentPlayer === 1 ? 2 : 1;
 
   // Fin de manche ?
   if (!canPlayerPlay()) {
-    const winnerIdx = currentPlayer===1 ? 1 : 0;
-    const loserIdx  = currentPlayer===1 ? 0 : 1;
+    const winnerIdx = currentPlayer === 1 ? 1 : 0;
+    const loserIdx = currentPlayer === 1 ? 0 : 1;
 
     showGameAlert(
-      `${playerNames[currentPlayer-1]} ne peut plus jouer. `+
-      `${playerNames[winnerIdx]} gagne la manche !`,
+      `${playerNames[currentPlayer - 1]} ne peut plus jouer. ` +
+        `${playerNames[winnerIdx]} gagne la manche !`,
       "danger"
     );
 
     // Maj stats
     playerVictories[winnerIdx]++;
     playerDefeats[loserIdx]++;
-    boResults.push(winnerIdx+1);
+    boResults.push(winnerIdx + 1);
 
     // Bonus de fin de manche
-    if (isPrime(lastNumber)) playerScores[winnerIdx]+=1000;
-    else                     playerScores[winnerIdx]+=500;
+    if (isPrime(lastNumber)) playerScores[winnerIdx] += 1000;
+    else playerScores[winnerIdx] += 500;
 
     updatePlayerInfo();
     updateVictoryDefeatDisplay();
@@ -248,16 +297,46 @@ function handleCellClick(cell) {
     // Envoi à l'API
     sendResultToAPI(winnerIdx, lastNumber);
 
-    // Fin de BO ?
-    const needed = Math.floor(boMaxRounds/2)+1;
-    const wins   = boResults.filter(r=>r===winnerIdx+1).length;
-    if (boMaxRounds && wins>=needed) {
-      showGameAlert(
-        `${playerNames[winnerIdx]} remporte le BO${boMaxRounds} ! Retour au menu.`,
-        "light"
-      );
-      localStorage.removeItem("boMax");
-      setTimeout(()=> window.location.href="index.html",1500);
+    // Fin de BO : affichage du modal récapitulatif
+    const needed = Math.floor(boMaxRounds / 2) + 1;
+    const wins = boResults.filter((r) => r === winnerIdx + 1).length;
+
+    if (boMaxRounds && wins >= needed) {
+      // on remplit le modal avec les scores & victoires
+      boCountSpan.textContent = boMaxRounds;
+      modalScore1.textContent = playerScores[0];
+      modalScore2.textContent = playerScores[1];
+      modalVic1.textContent = playerVictories[0];
+      modalVic2.textContent = playerVictories[1];
+
+      // on affiche le modal
+      endBoModal.show();
+
+      // bouton : rejouer même BO
+      btnRestartSameBo.onclick = () => {
+        endBoModal.hide();
+      
+        // vide l'historique des coups
+        coupsJ1 = [];
+        coupsJ2 = [];
+        historyList1.innerHTML = "";
+        historyList2.innerHTML = "";
+      
+        // vide le tableau des résultats BO
+        boResults = [];
+        updateBoIcons();
+      
+        // relance la grille
+        restartGame();
+      };
+
+      // bouton : retour au menu
+      btnBackToMenu.onclick = () => {
+        endBoModal.hide();
+        localStorage.removeItem("boMax");
+        window.location.href = "index.html";
+      };
+
       return;
     }
 
@@ -267,10 +346,10 @@ function handleCellClick(cell) {
 }
 
 function resetNormalCells() {
-  document.querySelectorAll(".grid-cell").forEach(cell=>{
+  document.querySelectorAll(".grid-cell").forEach((cell) => {
     const num = +cell.dataset.number;
-    if (!isPrime(num) && num!==1) {
-      cell.classList.replace("played","notPlayed");
+    if (!isPrime(num) && num !== 1) {
+      cell.classList.replace("played", "notPlayed");
       cell.style.pointerEvents = "auto";
       cell.style.opacity = "1";
     }
@@ -280,7 +359,7 @@ function resetNormalCells() {
 function restartGame() {
   playedNumbers = [];
   currentPlayer = 1;
-  lastNumber    = null;
+  lastNumber = null;
   mustPlayGreaterThan50 = false;
   coupsJ1 = [];
   coupsJ2 = [];
@@ -293,7 +372,7 @@ function restartGame() {
   updateBoIcons();
 }
 
-window.addEventListener("DOMContentLoaded", ()=>{
+window.addEventListener("DOMContentLoaded", () => {
   updatePlayerInfo();
   updateVictoryDefeatDisplay();
   generateGrid();
@@ -304,13 +383,13 @@ function indexRegles() {
   window.location.href = "index.html";
 }
 
-function showGameAlert(message, type="danger") {
+function showGameAlert(message, type = "danger") {
   const alertBox = document.getElementById("gameAlert");
   alertBox.className = `alert alert-${type}`;
   alertBox.textContent = message;
   alertBox.classList.remove("d-none");
   if (type !== "light") {
-    setTimeout(()=>alertBox.classList.add("d-none"),4000);
+    setTimeout(() => alertBox.classList.add("d-none"), 4000);
   }
 }
 
@@ -320,13 +399,13 @@ function sendResultToAPI(winnerIndex, lastMove) {
       nom: playerNames[0],
       score_total: playerScores[0],
       victoires: playerVictories[0],
-      defaites: playerDefeats[0]
+      defaites: playerDefeats[0],
     },
     joueur2: {
       nom: playerNames[1],
       score_total: playerScores[1],
       victoires: playerVictories[1],
-      defaites: playerDefeats[1]
+      defaites: playerDefeats[1],
     },
     partie: {
       score_j1: playerScores[0],
@@ -339,17 +418,20 @@ function sendResultToAPI(winnerIndex, lastMove) {
       erreurs_coups_j1: erreursJ1.join(","),
       coups_j2: coupsJ2.join(","),
       erreurs_coups_j2: erreursJ2.join(","),
-      coup_gagnant: lastMove
+      coup_gagnant: lastMove,
     },
-    joueur_gagnant: playerNames[winnerIndex]
+    joueur_gagnant: playerNames[winnerIndex],
   };
 
-  fetch("https://bawi2179.odns.fr/JuniperGreenPokemon/api/enregistrer_partie.php", {
-    method: "POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify(data)
-  })
-    .then(res => res.json())
-    .then(json => console.log("Réponse API :",json))
-    .catch(err => console.error("Erreur d'envoi API :",err));
+  fetch(
+    "https://bawi2179.odns.fr/JuniperGreenPokemon/api/enregistrer_partie.php",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  )
+    .then((res) => res.json())
+    .then((json) => console.log("Réponse API :", json))
+    .catch((err) => console.error("Erreur d'envoi API :", err));
 }

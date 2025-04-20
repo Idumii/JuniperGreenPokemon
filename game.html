@@ -85,14 +85,14 @@
         <!-- Historique côte à côte -->
         <div class="row mb-4">
             <div class="col-md-6 bg-white p-3 rounded shadow-sm">
-              <h5 class="text-center">Coups Joueur 1</h5>
-              <ul id="historyList1" class="list-unstyled mb-0"></ul>
+                <h5 class="text-center">Coups Joueur 1</h5>
+                <ul id="historyList1" class="list-unstyled mb-0"></ul>
             </div>
             <div class="col-md-6 bg-white p-3 rounded shadow-sm">
-              <h5 class="text-center">Coups Joueur 2</h5>
-              <ul id="historyList2" class="list-unstyled mb-0"></ul>
+                <h5 class="text-center">Coups Joueur 2</h5>
+                <ul id="historyList2" class="list-unstyled mb-0"></ul>
             </div>
-          </div>
+        </div>
 
         <!-- Boutons -->
         <div class="text-center mb-3">
@@ -102,7 +102,29 @@
 
     </div>
 
-    <script src="script.js"></script>
+    
+
+    <!-- Modal de fin de BO -->
+    <div class="modal fade" id="endBoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Fin du BO<span id="boCount"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Score Joueur 1 :</strong> <span id="modalScore1"></span></p>
+                    <p><strong>Score Joueur 2 :</strong> <span id="modalScore2"></span></p>
+                    <p><strong>Victoires J1 :</strong> <span id="modalVic1"></span> – <strong>J2 :</strong> <span
+                            id="modalVic2"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnRestartSameBo" type="button" class="btn btn-primary">Rejouer même BO</button>
+                    <button id="btnBackToMenu" type="button" class="btn btn-secondary">Retour au menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-light text-center text-muted py-3 fixed-bottom">
         <div class="container">
@@ -112,6 +134,9 @@
             </small>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    
 </body>
 
 </html>
