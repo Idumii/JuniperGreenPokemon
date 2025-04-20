@@ -1,182 +1,95 @@
+/* === GLOBAL === */
 body {
   background-color: #f8f9fa;
   font-family: Arial, sans-serif;
   color: #212529;
+  margin: 0;
+  padding: 0;
 }
 
+/* on centre tout et on passe à 66% de la largeur de la fenêtre */
+.container,
 .game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px auto;
-  max-width: 1200px;
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 60%;
+  max-width: none;   /* on désactive les max-width bootstrap si présent */
+  margin: 0 auto;
+  padding: 1rem;
 }
 
-.players-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: 20px;
-  gap: 40px;
-}
-
-.player-info {
-  width: 300px;
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.player-info input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  text-align: center;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  transition: all 0.3s ease;
-}
-
-.player-info input:focus {
-  outline: none;
-  border-color: #0056b3;
-  background-color: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
-}
-
-.player-info p {
-  margin-top: 0;
-  font-size: 32px;
-  color: #212529;
-  text-align: center;
-}
-
+/* === GRILLE DE JEU === */
 .grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 5px;
-  margin: 20px;
-  width: 600px;
+  gap: 6px;
+  margin: 1.5rem auto;
+  width: 100%;           /* occupe 100% de son container (donc 66% de la fenêtre) */
+  max-width: 800px;      /* ne dépasse jamais 800px */
   border: 1px solid #dee2e6;
   border-radius: 5px;
   background-color: #f8f9fa;
-  padding: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* obstacle carré inchangé */
 .grid-cell {
-  width: 100%;
-  padding-top: 100%; /* Keeps cells square */
   position: relative;
-  background-color: #ffffff;
+  background-color: #fff;
   border: 1px solid #dee2e6;
-  text-align: center;
-  font-weight: bold;
   cursor: pointer;
   user-select: none;
+  width: 100%;
+  padding-top: 100%;
 }
 
 .grid-cell span {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: #212529;
 }
 
 .grid-cell.played {
-  background-color: #6c757d !important;  /* gris foncé */
-  color: white        !important;
+  background-color: #6c757d !important;
+  color: #fff !important;
   cursor: not-allowed !important;
 }
 
-.grid-cell.pokemon {
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.history {
-  width: 600px;
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  padding: 15px;
-  overflow-y: auto;
-  max-height: 500px;
-  margin-top: 20px; /* Adds spacing between player info and history */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.history h4 {
-  text-align: center;
-}
-
-button {
-  font-size: 1rem;
-  padding: 10px 20px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #007bff;
-  color: #ffffff;
-}
-
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
-  font-size: 28px;
-  vertical-align: middle;
-}
-
-.score-icons {
+/* === HISTORIQUE DES COUPS === */
+.history-container {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 2rem;
+  margin: 1.5rem auto;
+  width: 100%;           /* prend 100% du container */
+  max-width: 800px;      /* même max que la grille pour être aligné */
 }
 
-.score-icons .material-symbols-outlined.green {
-  color: green;
+.history-container .card {
+  flex: 1;
 }
 
-.score-icons .material-symbols-outlined.red {
-  color: red;
+.history-container .card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
 }
 
-.score-icons .material-symbols-outlined.gray {
-  color: gray;
+.history-container ul {
+  list-style: none;
+  padding: .5rem;
+  margin: 0;
 }
 
-.box-green {
-  background-color: #e6f4ea;      /* vert très clair */
-  border-left: 4px solid #28a745; /* bande verte */
-  padding: 1rem;                  /* un peu d’air à l’intérieur */
-  border-radius: 0.25rem;         /* coins arrondis */
-}
-
-.box-yellow {
-  background-color: #fff8e1;      /* jaune très clair */
-  border-left: 4px solid #ffc107; /* bande jaune */
-  padding: 1rem;
-  border-radius: 0.25rem;
+/* === Surcharge responsive tablette / mobile === */
+@media (max-width: 1024px) {
+  .container,
+  .game-container {
+    width: 90%;          /* plus large sur tablette/phone */
+  }
+  .grid {
+    max-width: 100%;     /* occupe tout l’espace dispo */
+  }
+  button, input {
+    font-size: 1.1rem;
+  }
 }

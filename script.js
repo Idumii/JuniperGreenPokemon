@@ -288,7 +288,7 @@ function handleCellClick(cell) {
 
     showGameAlert(
       `${playerNames[currentPlayer - 1]} ne peut plus jouer. ` +
-        `${playerNames[winnerIdx]} gagne la manche !`,
+        `${playerNames[winnerIdx]} gagne la manche !`,
       "danger"
     );
 
@@ -298,8 +298,11 @@ function handleCellClick(cell) {
     boResults.push(winnerIdx + 1);
 
     // bonus de fin de manche
-    if (isPrime(lastNumber)) playerScores[winnerIdx] += 1000;
-    else playerScores[winnerIdx] += 500;
+    if (isPrime(lastNumber)) {
+      playerScores[winnerIdx] += 1000;
+    } else {
+      playerScores[winnerIdx] += 500;
+    }
     updatePlayerInfo();
     updateVictoryDefeatDisplay();
     updateBoIcons();
@@ -307,40 +310,72 @@ function handleCellClick(cell) {
     // envoi API
     sendResultToAPI(winnerIdx, lastNumber);
 
-    // fin de BO ?
+    // ======== NO-BO MODE ========
+    if (!boMaxRounds) {
+      // on remplit le modal AVEC BO=1 pour lever le titre
+      boCountSpan.textContent = 1;
+      modalScore1.textContent = playerScores[0];
+      modalScore2.textContent = playerScores[1];
+      modalVic1.textContent = playerVictories[0];
+      modalVic2.textContent = playerVictories[1];
+
+      endBoModalEl.querySelector(".modal-title").textContent = "Fin de partie";
+
+      // bouton : rejouer
+      btnRestartSameBo.textContent = "Rejouer";
+      btnRestartSameBo.onclick = () => {
+        endBoModal.hide();
+        restartGame();
+      };
+      // bouton : retour menu
+      btnBackToMenu.textContent = "Retour au menu";
+      btnBackToMenu.onclick = () => {
+        endBoModal.hide();
+        indexRegles();
+      };
+
+      endBoModal.show();
+      return;
+    }
+
+    // ======== BO MODE ========
     const needed = Math.floor(boMaxRounds / 2) + 1;
     const wins = boResults.filter((r) => r === winnerIdx + 1).length;
-    if (boMaxRounds && wins >= needed) {
-      // on préremplit le modal
+
+    if (wins >= needed) {
       boCountSpan.textContent = boMaxRounds;
       modalScore1.textContent = playerScores[0];
       modalScore2.textContent = playerScores[1];
       modalVic1.textContent = playerVictories[0];
       modalVic2.textContent = playerVictories[1];
-      endBoModal.show();
 
-      // bouton « jouer même BO »
+      endBoModalEl.querySelector(
+        ".modal-title"
+      ).textContent = `Fin du BO${boMaxRounds}`;
+
+      btnRestartSameBo.textContent = "Rejouer même BO";
       btnRestartSameBo.onclick = () => {
         endBoModal.hide();
-        // reset historique & BO
+        // on remet juste la manche à zéro
+        boResults = [];
         coupsJ1 = [];
         coupsJ2 = [];
         erreursJ1 = [];
         erreursJ2 = [];
-        boResults = [];
         updateBoIcons();
         restartGame();
       };
-      // bouton « retour menu »
+      btnBackToMenu.textContent = "Retour au menu";
       btnBackToMenu.onclick = () => {
         endBoModal.hide();
-        localStorage.removeItem("boMax");
-        window.location.href = "index.html";
+        indexRegles();
       };
+
+      endBoModal.show();
       return;
     }
 
-    // sinon nouvelle manche
+    // sinon on repart pour une manche de BO
     restartGame();
   }
 }
@@ -402,14 +437,33 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // popup d’alerte de jeu
-function showGameAlert(message, type = "danger") {
-  const alertBox = document.getElementById("gameAlert");
-  alertBox.className = `alert alert-${type}`;
-  alertBox.textContent = message;
-  alertBox.classList.remove("d-none");
-  if (type !== "light") {
-    setTimeout(() => alertBox.classList.add("d-none"), 4000);
-  }
+function showGameAlert(message, type = 'danger') {
+  const container = document.getElementById('toastContainer');
+  // Crée l’élément toast
+  const toastEl = document.createElement('div');
+  toastEl.className = `toast align-items-center text-bg-${type} border-0 mb-2`;
+  toastEl.setAttribute('role', 'alert');
+  toastEl.setAttribute('aria-live', 'assertive');
+  toastEl.setAttribute('aria-atomic', 'true');
+  toastEl.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">${message}</div>
+      <button 
+        type="button" 
+        class="btn-close btn-close-white me-2 m-auto" 
+        data-bs-dismiss="toast" 
+        aria-label="Fermer"
+      ></button>
+    </div>
+  `;
+  container.appendChild(toastEl);
+
+  // Initialise et affiche le toast (auto‑hide après 3 000 ms)
+  const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+  bsToast.show();
+
+  // On supprime l’élément du DOM une fois caché
+  toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
 }
 
 // Envoi des résultats vers ton API
@@ -419,13 +473,13 @@ function sendResultToAPI(winnerIndex, lastMove) {
       nom: playerNames[0],
       score_total: playerScores[0],
       victoires: playerVictories[0],
-      defaites: playerDefeats[0]
+      defaites: playerDefeats[0],
     },
     joueur2: {
       nom: playerNames[1],
       score_total: playerScores[1],
       victoires: playerVictories[1],
-      defaites: playerDefeats[1]
+      defaites: playerDefeats[1],
     },
     partie: {
       score_j1: playerScores[0],
@@ -439,24 +493,24 @@ function sendResultToAPI(winnerIndex, lastMove) {
       erreurs_coups_j1: erreursJ1.join(","),
       coups_j2: coupsJ2.join(","),
       erreurs_coups_j2: erreursJ2.join(","),
-      coup_gagnant: lastMove
+      coup_gagnant: lastMove,
     },
-    joueur_gagnant: playerNames[winnerIndex]
+    joueur_gagnant: playerNames[winnerIndex],
   };
 
   fetch("api/enregistrer_partie.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)    // <— on stringify bien `payload`
+    body: JSON.stringify(payload), // <— on stringify bien `payload`
   })
-  .then(async res => {
-    const text = await res.text();
-    try {
-      const json = JSON.parse(text);
-      console.log("Réponse API :", json);
-    } catch (e) {
-      console.warn("Réponse API non‑JSON reçue :", text);
-    }
-  })
-  .catch(err => console.error("Erreur d'envoi API :", err));
+    .then(async (res) => {
+      const text = await res.text();
+      try {
+        const json = JSON.parse(text);
+        console.log("Réponse API :", json);
+      } catch (e) {
+        console.warn("Réponse API non‑JSON reçue :", text);
+      }
+    })
+    .catch((err) => console.error("Erreur d'envoi API :", err));
 }
