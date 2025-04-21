@@ -14,7 +14,7 @@ try {
       SELECT nom, score_total, victoires, defaites
       FROM joueurs
       ORDER BY score_total DESC
-      LIMIT 20
+      LIMIT 10
     ");
     $leader = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -25,7 +25,7 @@ try {
       JOIN joueurs j1 ON p.joueur1_id = j1.id
       JOIN joueurs j2 ON p.joueur2_id = j2.id
       ORDER BY p.date_partie DESC
-      LIMIT 10
+      LIMIT 5
     ");
     $history = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 

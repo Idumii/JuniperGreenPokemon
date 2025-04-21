@@ -7,17 +7,54 @@
   <title>Juniper Green Pokémon</title>
   <!-- favicon principal (ICO) -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
-  <!-- si tu as les PNG, ça améliore la compatibilité -->
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
+
   <style>
-    /* Pour donner un peu d’air à ton layout */
+    /* ===== POUR LA MISE EN PAGE GLOBALE ===== */
+    html {
+      font-size: 18px;
+    }
+
+    /* Ensure the footer sticks to the bottom */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    main {
+      flex-grow: 1;
+    }
+
+    /* Remove extra padding/margin that might push the footer */
+    body>* {
+      margin: 0;
+      padding: 0;
+    }
+
     .rules-container {
       padding-right: 2rem;
+      font-size: 1.125rem;
+      line-height: 1.6;
+    }
+
+    .rules-container h3 {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .rules-container p {
+      margin-bottom: 1rem;
+    }
+
+    .rules-container .box-green,
+    .rules-container .box-yellow {
+      padding: 1.25rem;
     }
 
     .sidebar .card {
@@ -28,145 +65,110 @@
       max-height: 80vh;
       overflow-y: auto;
     }
-
-    /* –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– */
-    /* 1) On augmente la taille de base du texte du document         */
-    html {
-      font-size: 18px;
-      /* au lieu de 16px par défaut */
-    }
-
-    /* 2) On retravaille un peu les règles de typographie pour la zone */
-    .rules-container {
-      font-size: 1.125rem;
-      /* 1.125 × 18px = ~20px */
-      line-height: 1.6;
-    }
-
-    .rules-container h3 {
-      font-size: 1.5rem;
-      /* 1.5 × 18px = 27px */
-      margin-top: 1.5rem;
-    }
-
-    .rules-container p {
-      margin-bottom: 1rem;
-    }
-
-    /* 3) On peut aussi augmenter légèrement l’espacement */
-    .rules-container .box-green,
-    .rules-container .box-yellow {
-      padding: 1.25rem;
-    }
   </style>
 </head>
 
-<body class="py-4 pb-5">
+<body class="d-flex flex-column min-vh-100">
+  <!-- Contenu principal -->
+  <main class="flex-fill">
+    <div class="container">
+      <h1 class="text-center bg-primary text-white p-2 rounded">Juniper Green Pokémon</h1>
 
-  <div class="container">
-    <h1 class="text-center bg-primary text-white p-2 rounded">Juniper Green Pokémon</h1>
-    <div class="row">
-      <!-- COLONNE GAUCHE : 8/12 -->
-      <div class="col-lg-8 rules-container">
+      <div class="row">
+        <!-- COLONNE GAUCHE : RÈGLES -->
+        <div class="col-lg-8 rules-container">
+          <h3 class="mt-4">Consignes</h3>
+          <p>1. Le Joueur 1 commence et choisit un <strong>nombre pair</strong> dans la grille.</p>
+          <p>2. À chaque tour, le joueur suivant doit sélectionner un nombre qui est soit un <strong>multiple</strong>,
+            soit un <strong>diviseur</strong> du dernier nombre joué.</p>
+          <p>3. En temps normal, un nombre <strong>déjà joué</strong> ne peut plus être rejoué.</p>
+          <p>4. La partie s’arrête dès qu’un joueur ne peut plus jouer : il perd et son adversaire gagne.</p>
 
-        <h3 class="mt-4">Consignes</h3>
-
-        <p>1. Le Joueur 1 commence et choisit un <strong>nombre pair</strong> dans la grille.</p>
-        <p>2. À chaque tour, le joueur suivant doit sélectionner un nombre qui est soit un <strong>multiple</strong>,
-          soit un <strong>diviseur</strong> du dernier nombre joué.</p>
-        <p>3. En temps normal, un nombre <strong>déjà joué</strong> ne peut plus être rejoué.</p>
-        <p>4. La partie s’arrête dès qu’un joueur ne peut plus jouer : il perd et son adversaire gagne.</p>
-
-        <h3 class="mt-4">Cases spéciales</h3>
-
-        <div class="box-green mb-3">
-          <strong>Cases Pokémon</strong>
-          <p>
-            Quand vous jouez une case marquée d’un Pokémon (toutes sauf la case <strong>1</strong>),
-            <strong>toutes</strong> les cases sans Pokémon (même celles déjà jouées) redeviennent disponibles.
-          </p>
-        </div>
-
-        <div class="box-yellow mb-4">
-          <strong>Case Magicarpe</strong>
-          <p>
-            Si vous jouez la case <strong>1</strong> (Magicarpe),
-            votre adversaire doit répondre avec un nombre <strong>supérieur ou égal à 50</strong>.
-          </p>
-        </div>
-
-
-      </div>
-
-      <!-- COLONNE DROITE : 4/12 -->
-      <div class="col-lg-4 sidebar">
-        <!-- Cadre Classement -->
-        <div class="card">
-          <div class="card-header bg-primary text-white">Classement global</div>
-          <div class="card-body p-2">
-            <table class="table table-sm mb-0">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Joueur</th>
-                  <th>Pts</th>
-                </tr>
-              </thead>
-              <tbody id="tblSidebarClassement"></tbody>
-            </table>
+          <h3 class="mt-4">Cases spéciales</h3>
+          <div class="box-green mb-3">
+            <strong>Cases Pokémon</strong>
+            <p>Quand vous jouez une case marquée d’un Pokémon (toutes sauf la case <strong>1</strong>),
+              <strong>toutes</strong> les cases sans Pokémon (même celles déjà jouées) redeviennent disponibles.
+            </p>
+          </div>
+          <div class="box-yellow mb-4">
+            <strong>Case Magicarpe</strong>
+            <p>Si vous jouez la case <strong>1</strong> (Magicarpe), votre adversaire doit répondre avec un nombre
+              <strong>supérieur ou égal à 50</strong>.
+            </p>
           </div>
         </div>
-        <!-- Cadre Historique -->
-        <div class="card">
-          <div class="card-header bg-secondary text-white">Dernières parties</div>
-          <div class="card-body p-2">
-            <ul class="list-unstyled small" id="lstSidebarHistorique"></ul>
+
+        <!-- COLONNE DROITE : CLASSEMENT & HISTO -->
+        <div class="col-lg-4 sidebar">
+          <div class="card">
+            <div class="card-header bg-primary text-white">Classement global</div>
+            <div class="card-body p-2">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Joueur</th>
+                    <th>Pts</th>
+                  </tr>
+                </thead>
+                <tbody id="tblSidebarClassement"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header bg-secondary text-white">Dernières parties</div>
+            <div class="card-body p-2">
+              <ul class="list-unstyled small" id="lstSidebarHistorique"></ul>
+            </div>
           </div>
         </div>
-      </div><!-- /.col-lg-4 -->
-
-    </div><!-- /.row -->
-    <div class="text-center">
-      <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
-      <div class="d-flex justify-content-center gap-2">
-        <button class="btn btn-outline-primary" onclick="setBO(1)">BO1</button>
-        <button class="btn btn-outline-warning" onclick="setBO(3)">BO3</button>
-        <button class="btn btn-outline-danger" onclick="setBO(5)">BO5</button>
       </div>
 
+      <!-- Boutons BO -->
+      <div class="text-center">
+        <button class="btn btn-primary mb-2" onclick="startGame()">Commencer la Partie</button>
+        <div class="d-flex justify-content-center gap-2">
+          <button class="btn btn-outline-primary" onclick="setBO(1)">BO1</button>
+          <button class="btn btn-outline-warning" onclick="setBO(3)">BO3</button>
+          <button class="btn btn-outline-danger" onclick="setBO(5)">BO5</button>
+        </div>
+      </div>
     </div>
-  </div><!-- /.container -->
+  </main>
 
+  <!-- Footer sticky via mt-auto -->
+  <footer class="mt-auto bg-light text-center text-muted py-3">
+    <div class="container">
+      <small>
+        Site web développé par Vincent Diévart.
+        <a href="mentions-legales.html" class="text-decoration-none">Mentions légales</a>
+      </small>
+    </div>
+  </footer>
+
+  <!-- scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Récupère classement + historique
+    // fetch classement + historique
     fetch("api/get_leaderboard.php")
       .then(r => r.json())
       .then(data => {
-        // Classement
         const tb = document.getElementById("tblSidebarClassement");
         data.leaderboard.forEach((p, i) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${p.nom}</td>
-            <td>${p.score_total}</td>
-          `;
+          tr.innerHTML = `<td>${i + 1}</td><td>${p.nom}</td><td>${p.score_total}</td>`;
           tb.appendChild(tr);
         });
-
-        // Historique
         const ul = document.getElementById("lstSidebarHistorique");
-        data.history.forEach(p => {
+        data.history.slice(0, 5).forEach(p => {
           const li = document.createElement("li");
-          li.textContent =
-            `${new Date(p.date_partie).toLocaleDateString()} — ` +
-            `${p.j1}(${p.score_j1}) vs ${p.j2}(${p.score_j2})`;
+          li.textContent = `${new Date(p.date_partie).toLocaleDateString()} — ${p.j1}(${p.score_j1}) vs ${p.j2}(${p.score_j2})`;
           ul.appendChild(li);
         });
       })
       .catch(console.error);
 
-    // Fonctions pour démarrer / choisir BO
     function setBO(n) {
       localStorage.setItem("boMax", n);
       window.location.href = "game.html";
@@ -176,15 +178,6 @@
       window.location.href = "game.html";
     }
   </script>
-
-  <footer class="bg-light text-center text-muted py-3 fixed-bottom">
-    <div class="container">
-      <small>
-        Site web développé par Vincent Diévart.
-        <a href="mentions-legales.html" class="text-decoration-none">Mentions légales</a>
-      </small>
-    </div>
-  </footer>
 </body>
 
 </html>

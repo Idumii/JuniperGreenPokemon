@@ -1,10 +1,24 @@
 /* === GLOBAL === */
-body {
-  background-color: #f8f9fa;
-  font-family: Arial, sans-serif;
-  color: #212529;
+/* 1) on force tout le document à 100% de la hauteur de la fenêtre */
+html, body {
+  height: 100%;
   margin: 0;
-  padding: 0;
+}
+
+/* 2) on transforme le body en flex-column */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3) on fait en sorte que le contenu pousse le footer vers le bas */
+main, .container {
+  flex: 1;               /* c’est votre zone de contenu principale */
+}
+
+/* 4) on colle le footer tout en bas dans le flex-flow */
+footer {
+  margin-top: auto;
 }
 
 /* on centre tout et on passe à 66% de la largeur de la fenêtre */
