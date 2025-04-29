@@ -49,9 +49,9 @@
 
     <div class="container">
         <h1>
-            Top scores
+            Scores
         </h1>
-        <ul class="list-group" id="ulTopScores"></ul>
+        <ul class="list-group" id="lstTopScores"></ul>
 
 
 
@@ -107,6 +107,7 @@
                         ulCG.appendChild(li);
                     });
 
+                    //top scores j1 j2
                     // on suppose que le fetch a déjà été fait et que `data` est ton objet JSON
                     const ts = data.topScores;  // { score_max_j1, score_max_j2, score_moyen_j1, score_moyen_j2 }
                     const ulTopScores = document.getElementById("lstTopScores");
@@ -125,7 +126,7 @@
                         `Joueur 2 – Meilleur score : ${ts.score_max_j2} | Score moyen : ${ts.score_moyen_j2}`;
                     ulTopScores.appendChild(li2);
                 })
-                .catch(console.error);
+            .catch (console.error);
         </script>
         <footer class="bg-light text-center text-muted py-3 fixed-bottom">
             <div class="container">
