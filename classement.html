@@ -39,7 +39,7 @@
 
 
     <div class="container">
-        <h1> 
+        <h1>
             Coups gagnants
         </h1>
         <ul class="list-group" id="lstCoupsGagnants"></ul>
@@ -94,13 +94,13 @@
                     ul.appendChild(li);
                 });
 
-                // coups gagnants
-                const ulCoupsGagnants = document.getElementById("lstCoupsGagnants");
-                data.coups_gagnants.forEach(p => {
+                // coups gagnants (on lit data.coups_gagnants)
+                const ulCG = document.getElementById("lstCoupsGagnants");
+                data.coups_gagnants.forEach(item => {
                     const li = document.createElement("li");
                     li.className = "list-group-item";
-                    li.textContent = `Coup ${p.coup_gagnant} : ${p.nb_victoires} victoires`;
-                    ulCoupsGagnants.appendChild(li);
+                    li.textContent = `Coup ${item.coup_gagnant} : ${item.nb_victoires} victoires`;
+                    ulCG.appendChild(li);
                 });
 
             })
