@@ -47,7 +47,11 @@
 
 
 
-
+    <div class="container">
+        <h1>
+            Top scores
+        </h1>
+        <ul class="list-group" id="lstTopScores"></ul>
 
 
 
@@ -101,6 +105,15 @@
                     li.className = "list-group-item";
                     li.textContent = `Coup ${item.coup_gagnant} : ${item.nb_victoires} victoires`;
                     ulCG.appendChild(li);
+                });
+
+                //top scores j1 j2
+                const ulTopScores = document.getElementById("lstTopScores");
+                data.topScores.forEach(item => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = `Top score j1: ${item.score_max_j1} \n Top score j2: ${item.score_max_j2}`;
+                    ulTopScores.appendChild(li);
                 });
 
             })
