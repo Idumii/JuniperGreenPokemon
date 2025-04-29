@@ -69,62 +69,72 @@
 
 
 
-    <script>
-        fetch("api/get_leaderboard.php")
-            .then(res => res.json())
-            .then(data => {
-                // classement
-                const table = document.querySelector("#tblClassement tbody");
-                data.leaderboard.forEach((p, i) => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
+        <script>
+            fetch("api/get_leaderboard.php")
+                .then(res => res.json())
+                .then(data => {
+                    // classement
+                    const table = document.querySelector("#tblClassement tbody");
+                    data.leaderboard.forEach((p, i) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
             <td>${i + 1}</td>
             <td>${p.nom}</td>
             <td>${p.score_total}</td>
             <td>${p.victoires}</td>
             <td>${p.defaites}</td>
           `;
-                    table.appendChild(tr);
-                });
+                        table.appendChild(tr);
+                    });
 
-                // historique
-                const ul = document.getElementById("lstHistorique");
-                data.history.forEach(p => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item";
-                    li.textContent =
-                        `${p.date_partie} — ${p.j1} (${p.score_j1}) vs ${p.j2} (${p.score_j2}) — ` +
-                        `coup gagnant : ${p.coup_gagnant}`;
-                    ul.appendChild(li);
-                });
+                    // historique
+                    const ul = document.getElementById("lstHistorique");
+                    data.history.forEach(p => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item";
+                        li.textContent =
+                            `${p.date_partie} — ${p.j1} (${p.score_j1}) vs ${p.j2} (${p.score_j2}) — ` +
+                            `coup gagnant : ${p.coup_gagnant}`;
+                        ul.appendChild(li);
+                    });
 
-                // coups gagnants (on lit data.coups_gagnants)
-                const ulCG = document.getElementById("lstCoupsGagnants");
-                data.coups_gagnants.forEach(item => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item";
-                    li.textContent = `Coup ${item.coup_gagnant} : ${item.nb_victoires} victoires`;
-                    ulCG.appendChild(li);
-                });
+                    // coups gagnants (on lit data.coups_gagnants)
+                    const ulCG = document.getElementById("lstCoupsGagnants");
+                    data.coups_gagnants.forEach(item => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item";
+                        li.textContent = `Coup ${item.coup_gagnant} : ${item.nb_victoires} victoires`;
+                        ulCG.appendChild(li);
+                    });
 
-                //top scores j1 j2
-                const ts = data.topScores; 
-                const li = document.createElement("li");
-                li.className = "list-group-item";
-                li.textContent = `Meilleur score J1 : ${ts.score_max_j1} — Meilleur score J2 : ${ts.score_max_j2}`;
-                ulTopScores.appendChild(li);
+                    // on suppose que le fetch a déjà été fait et que `data` est ton objet JSON
+                    const ts = data.topScores;  // { score_max_j1, score_max_j2, score_moyen_j1, score_moyen_j2 }
+                    const ulTopScores = document.getElementById("lstTopScores");
 
-            })
-            .catch(console.error);
-    </script>
-    <footer class="bg-light text-center text-muted py-3 fixed-bottom">
-        <div class="container">
-            <small>
-                Site web développé par Vincent Diévart.
-                <a href="mentions-legales.html" class="text-decoration-none">Mentions légales</a>
-            </small>
-        </div>
-    </footer>
+                    // Ligne pour Joueur 1
+                    const li1 = document.createElement("li");
+                    li1.className = "list-group-item";
+                    li1.textContent =
+                        `Joueur 1 – Meilleur score : ${ts.score_max_j1} | Score moyen : ${ts.score_moyen_j1}`;
+                    ulTopScores.appendChild(li1);
+
+                    // Ligne pour Joueur 2
+                    const li2 = document.createElement("li");
+                    li2.className = "list-group-item";
+                    li2.textContent =
+                        `Joueur 2 – Meilleur score : ${ts.score_max_j2} | Score moyen : ${ts.score_moyen_j2}`;
+                    ulTopScores.appendChild(li2);
+                })
+                .catch(console.error);
+        </script>
+        <footer class="bg-light text-center text-muted py-3 fixed-bottom">
+            <div class="container">
+                <small>
+                    Site web développé par Vincent Diévart.
+                    <a href="mentions-legales.html" class="text-decoration-none">Mentions légales</a>
+                </small>
+            </div>
+        </footer>
 </body>
 
 </html>

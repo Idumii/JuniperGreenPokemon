@@ -40,9 +40,7 @@ try {
   $topCoups = $stmt3->fetchAll(PDO::FETCH_ASSOC);
 
   $stmt4 = $pdo->query("
-  SELECT MAX(score_j1) as score_max_j1, MAX(score_j2) as score_max_j2
-   FROM parties;
-   ");
+  SELECT MAX(score_j1) as score_max_j1, MAX(score_j2) as score_max_j2, ROUND(AVG(score_j1),0) as score_moyen_j1, ROUND(AVG(score_j2),0) as score_moyen_j2 FROM parties;");
   $topScores = $stmt4->fetch(PDO::FETCH_ASSOC);
 
 
@@ -51,7 +49,7 @@ try {
     "leaderboard" => $leader,
     "history" => $history,
     "coups_gagnants" => $topCoups,
-    "topScores"=> $topScores
+    "topScores" => $topScores
 
   ]);
 
