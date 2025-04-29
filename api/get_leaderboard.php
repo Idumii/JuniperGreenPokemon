@@ -43,7 +43,7 @@ try {
     echo json_encode([
       "leaderboard" => $leader,
       "history"     => $history,
-      "topCoups" => $topCoups
+      "coup_gagnants" => $topCoups
     ]);
 
 } catch (PDOException $e) {
