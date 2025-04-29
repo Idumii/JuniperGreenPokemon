@@ -29,9 +29,21 @@ try {
     ");
     $history = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
+    $stmt3 = $pdo->query("
+    SELECT coup_gagnant, COUNT(*) AS nb_victoires
+    FROM parties
+    GROUP BY coup_gagnant
+    ORDER BY nb_victoires DESC
+    LIMIT 5
+  ");
+  $topCoups = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+
+    
+
     echo json_encode([
       "leaderboard" => $leader,
-      "history"     => $history
+      "history"     => $history,
+      "topCoups" => $topCoups
     ]);
 
 } catch (PDOException $e) {

@@ -35,6 +35,36 @@
     <h2>Dernières Parties</h2>
     <ul class="list-group" id="lstHistorique"></ul>
 
+
+
+
+    <div class="container">
+        <h1> 
+            Coups gagnants
+        </h1>
+        <ul class="list-group" id="lstCoupsGagnants"></ul>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script>
         fetch("api/get_leaderboard.php")
             .then(res => res.json())
@@ -63,6 +93,16 @@
                         `coup gagnant : ${p.coup_gagnant}`;
                     ul.appendChild(li);
                 });
+
+                // coups gagnants
+                const ulCoupsGagnants = document.getElementById("lstCoupsGagnants");
+                data.coups_gagnants.forEach(p => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = `Coup ${p.coup_gagnant} : ${p.nb_victoires} victoires`;
+                    topList.appendChild(li);
+                });
+
             })
             .catch(console.error);
     </script>
