@@ -108,13 +108,10 @@
                 });
 
                 //top scores j1 j2
-                const ulTopScores = document.getElementById("lstTopScores");
-                data.topScores.forEach(item => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item";
-                    li.textContent = `Top score j1: ${item.score_max_j1} \n Top score j2: ${item.score_max_j2}`;
-                    ulTopScores.appendChild(li);
-                });
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = `Meilleur score J1 : ${ts.score_max_j1} — Meilleur score J2 : ${ts.score_max_j2}`;
+                ulTopScores.appendChild(li);
 
             })
             .catch(console.error);
